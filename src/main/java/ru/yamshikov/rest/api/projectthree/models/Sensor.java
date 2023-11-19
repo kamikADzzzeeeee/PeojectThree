@@ -12,7 +12,7 @@ import java.util.List;
 @Entity
 @Table(name = "Sensor")
 @Data
-@ToString
+@ToString(of = {"id", "name", "serialNumber", "registratedAt"})
 public class Sensor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

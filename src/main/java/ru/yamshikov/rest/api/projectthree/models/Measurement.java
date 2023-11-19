@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "Measurement")
 @Data
-@ToString
+@ToString(of = {"id","temperature", "humidity", "weather", "registratedAt"})
 public class Measurement {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
