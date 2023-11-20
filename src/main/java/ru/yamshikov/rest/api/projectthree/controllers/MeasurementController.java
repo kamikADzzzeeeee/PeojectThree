@@ -41,7 +41,7 @@ public class MeasurementController {
 
     @PostMapping("/add")
     public ResponseEntity<HttpStatus> addPage(@RequestBody @Valid MeasurementSensorDtoIn dtoInfo, BindingResult bindingResult){
-
+        //Валидация DTO
         if(bindingResult.hasErrors()){
             List<FieldError> errors = bindingResult.getFieldErrors();
             StringBuilder result = new StringBuilder();
@@ -53,14 +53,13 @@ public class MeasurementController {
             }
             throw new MeasurementNotRegistratedException(result.toString());
         }
-
+        //Получение измерения из DTO
         Measurement measurement = MeasurementSensorDtoIn.toMeasurement(
                 dtoInfo,
                 measurementSensorMapper,
                 sensorMapper,
                 measurementMapper);
 
-        System.out.println(measurement);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

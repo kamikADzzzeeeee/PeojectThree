@@ -14,6 +14,8 @@ import ru.yamshikov.rest.api.projectthree.util.mapper.AbstractDto;
 import java.time.LocalDateTime;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class MeasurementSensorDtoIn implements AbstractDto {
 
     @Min(value = -100, message = "Температура не должна быть ниже минус 100 °C")

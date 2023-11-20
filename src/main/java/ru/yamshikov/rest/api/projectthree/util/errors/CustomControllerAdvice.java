@@ -9,6 +9,7 @@ import ru.yamshikov.rest.api.projectthree.util.errors.exceptions.measurement.Mea
 import ru.yamshikov.rest.api.projectthree.util.errors.exceptions.sensor.EmptySensorListException;
 import ru.yamshikov.rest.api.projectthree.util.errors.exceptions.sensor.SensorAlreadyExistsException;
 import ru.yamshikov.rest.api.projectthree.util.errors.exceptions.sensor.SensorNotCreatedException;
+import ru.yamshikov.rest.api.projectthree.util.errors.exceptions.sensor.SensorNotRegistratedException;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -34,6 +35,29 @@ public class CustomControllerAdvice {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
         ErrorResponse response = new ErrorResponse("Датчик с таким серйным номером уже существует", dtf.format(LocalDateTime.now()));
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(SensorNotRegistratedException.class)
+    public ResponseEntity<ErrorResponse> handleException(SensorNotRegistratedException e) {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
+        ErrorResponse response = new ErrorResponse("Невозможно добавить измерение т.к. датчик не зарегестрирован", dtf.format(LocalDateTime.now()));
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    //----------------//
+
+    @ExceptionHandler(MeasurementNotRegistratedException.class)
+    public ResponseEntity<ErrorResponse> handleException(MeasurementNotRegistratedException e) {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
+        ErrorResponse response = new ErrorResponse(e.getMessage(), dtf.format(LocalDateTime.now()));
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(EmptyMeasurementListException.class)
+    public ResponseEntity<ErrorResponse> handleException(EmptyMeasurementListException e) {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
+        ErrorResponse response = new ErrorResponse("Список измерений пуст", dtf.format(LocalDateTime.now()));
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
 }

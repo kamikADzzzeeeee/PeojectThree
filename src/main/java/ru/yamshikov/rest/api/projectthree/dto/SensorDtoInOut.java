@@ -8,6 +8,7 @@ import ru.yamshikov.rest.api.projectthree.util.mapper.AbstractDto;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class SensorDtoInOut implements AbstractDto {
     @Size(min = 0, max = 50, message = "Поле должно содержать от 0 до 50 символов")
     private String name;

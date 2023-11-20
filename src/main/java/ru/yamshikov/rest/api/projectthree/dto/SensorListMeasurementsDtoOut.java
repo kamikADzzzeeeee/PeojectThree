@@ -1,6 +1,8 @@
 package ru.yamshikov.rest.api.projectthree.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import ru.yamshikov.rest.api.projectthree.mapper.MeasurementMapper;
 import ru.yamshikov.rest.api.projectthree.mapper.SensorMapper;
 import ru.yamshikov.rest.api.projectthree.models.Measurement;
@@ -13,9 +15,12 @@ import java.util.List;
 import java.util.Set;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class SensorListMeasurementsDtoOut implements AbstractDto {
-    private List<MeasurementDtoOut> measurements;
     private SensorDtoInOut sensor;
+    private List<MeasurementDtoOut> measurements;
+
 
     public static Set<SensorListMeasurementsDtoOut> toSet(Set<Sensor> setSensor, MeasurementMapper measurementMapper, SensorMapper sensorMapper){
         Set<SensorListMeasurementsDtoOut> setSenMeasDto = new HashSet<>();
