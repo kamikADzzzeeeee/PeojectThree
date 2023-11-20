@@ -2,6 +2,7 @@ package ru.yamshikov.rest.api.projectthree.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.ToString;
@@ -26,8 +27,9 @@ public class Sensor implements AbstractEntity {
     private String name;
 
     @Column(name = "serial_number")
-    @Min(value = 0, message = "Серийный номера датчика должен быть больше 0")
-    private Integer serialNumber;
+    @NotNull(message = "Поле не должно быть пустым")
+    @Min(value = 1, message = "Серийный номера датчика должен быть больше 0")
+    private Long serialNumber;
 
     @Column(name = "created_at")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
