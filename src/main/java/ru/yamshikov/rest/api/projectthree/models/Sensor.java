@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 import ru.yamshikov.rest.api.projectthree.util.mapper.AbstractEntity;
@@ -16,6 +17,7 @@ import java.util.List;
 @Table(name = "Sensor")
 @Data
 @ToString(of = {"id", "name", "serialNumber", "registratedAt"})
+@EqualsAndHashCode(of = {"id", "name", "serialNumber", "registratedAt"})
 public class Sensor implements AbstractEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
