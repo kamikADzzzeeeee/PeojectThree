@@ -7,13 +7,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-import ru.yamshikov.rest.api.projectthree.dto.SensorDtoInfo;
-import ru.yamshikov.rest.api.projectthree.mapper.SensorMapperInfo;
+import ru.yamshikov.rest.api.projectthree.dto.SensorDtoInOut;
+import ru.yamshikov.rest.api.projectthree.mapper.SensorMapper;
 import ru.yamshikov.rest.api.projectthree.services.SensorService;
-import ru.yamshikov.rest.api.projectthree.util.errors.exceptions.EmptySensorListException;
-import ru.yamshikov.rest.api.projectthree.util.errors.exceptions.SensorNotCreatedException;
+import ru.yamshikov.rest.api.projectthree.util.errors.exceptions.sensor.SensorNotCreatedException;
 
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,23 +21,19 @@ import java.util.stream.Collectors;
 public class SensorController {
 
     private final SensorService sensorService;
-    private final SensorMapperInfo sensorMapperInfo;
+    private final SensorMapper sensorMapper;
 
     @GetMapping()
-    public ResponseEntity<List<SensorDtoInfo>> sensorsPage(){
-        List<SensorDtoInfo> sensors = sensorService.findAllSensors()
+    public ResponseEntity<List<SensorDtoInOut>> sensorsPage(){
+        List<SensorDtoInOut> sensors = sensorService.findAllSensors()
                 .stream()
-                .map(sensorMapperInfo::toDto)
+                .map(sensorMapper::toDto)
                 .collect(Collectors.toList());
-        if (sensors.isEmpty()){
-            throw new EmptySensorListException();
-        } else {
-            return new ResponseEntity<>(sensors, HttpStatus.OK);
-        }
+        return new ResponseEntity<>(sensors, HttpStatus.OK);
     }
 
     @PostMapping("/registration")
-    public ResponseEntity<HttpStatus> registrationPage(@RequestBody @Valid SensorDtoInfo dtoInfo,
+    public ResponseEntity<HttpStatus> registrationPage(@RequestBody @Valid SensorDtoInOut dtoInfo,
                                                        BindingResult bindingResult){
         if(bindingResult.hasErrors()){
             List<FieldError> errors = bindingResult.getFieldErrors();
@@ -52,7 +46,7 @@ public class SensorController {
             }
             throw new SensorNotCreatedException(result.toString());
         }
-        sensorService.creatSensor(sensorMapperInfo.toEntity(dtoInfo));
+        sensorService.creatSensor(sensorMapper.toEntity(dtoInfo));
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
