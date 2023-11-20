@@ -5,7 +5,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yamshikov.rest.api.projectthree.models.Sensor;
 import ru.yamshikov.rest.api.projectthree.repositories.SensorRepository;
-import ru.yamshikov.rest.api.projectthree.util.errors.exceptions.SensorAlreadyExistsException;
+import ru.yamshikov.rest.api.projectthree.util.errors.exceptions.sensor.EmptySensorListException;
+import ru.yamshikov.rest.api.projectthree.util.errors.exceptions.sensor.SensorAlreadyExistsException;
 
 import java.util.List;
 
@@ -17,7 +18,11 @@ public class SensorService {
     private final SensorRepository sensorRepository;
 
     public List<Sensor> findAllSensors(){
-        return sensorRepository.findAll();
+        List<Sensor> sensors = sensorRepository.findAll();
+        if (sensors.isEmpty()){
+            throw new EmptySensorListException();
+        }
+        return sensors;
     }
 
     @Transactional(readOnly = false)
