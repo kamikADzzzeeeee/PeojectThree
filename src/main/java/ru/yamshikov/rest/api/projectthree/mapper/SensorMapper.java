@@ -2,16 +2,16 @@ package ru.yamshikov.rest.api.projectthree.mapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.yamshikov.rest.api.projectthree.dto.SensorDtoInfo;
+import ru.yamshikov.rest.api.projectthree.dto.SensorDtoInOut;
 import ru.yamshikov.rest.api.projectthree.models.Sensor;
 import ru.yamshikov.rest.api.projectthree.util.mapper.AbstractMapper;
 
 @Component
-public class SensorMapperInfo extends AbstractMapper<Sensor,SensorDtoInfo> {
+public class SensorMapper extends AbstractMapper<Sensor, SensorDtoInOut> {
 
     @Autowired
-    public SensorMapperInfo() {
-        super(Sensor.class, SensorDtoInfo.class);
+    public SensorMapper() {
+        super(Sensor.class, SensorDtoInOut.class);
     }
 
 }
