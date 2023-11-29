@@ -7,7 +7,6 @@ import ru.yamshikov.rest.api.projectthree.models.Measurement;
 import ru.yamshikov.rest.api.projectthree.models.Sensor;
 
 import java.util.List;
-import java.util.Set;
 
 @Repository
 public interface MeasurementRepository extends JpaRepository<Measurement,Integer> {
@@ -16,5 +15,8 @@ public interface MeasurementRepository extends JpaRepository<Measurement,Integer
     @Query(value = "select s from Sensor s join fetch s.measurements")
     List<Sensor> findAllMeasurementWithSensor();
 
+    List<Measurement> findByWeatherEquals(String meather);
+
+    List<Measurement> findBySensorEquals(Sensor sensor);
 
 }

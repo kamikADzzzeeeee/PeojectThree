@@ -1,73 +1,98 @@
 package ru.yamshikov.rest.api.projectthree.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-import ru.yamshikov.rest.api.projectthree.dto.MeasurementSensorDtoIn;
-import ru.yamshikov.rest.api.projectthree.dto.SensorListMeasurementsDtoOut;
-import ru.yamshikov.rest.api.projectthree.mapper.MeasurementMapper;
-import ru.yamshikov.rest.api.projectthree.mapper.MeasurementSensorMapper;
-import ru.yamshikov.rest.api.projectthree.mapper.SensorMapper;
-import ru.yamshikov.rest.api.projectthree.models.Measurement;
+import ru.yamshikov.rest.api.projectthree.dto.measurement.RegistrationMeasurementDto;
+import ru.yamshikov.rest.api.projectthree.dto.measurement.WeatherDaysCountDtoOut;
+import ru.yamshikov.rest.api.projectthree.dto.sensor.SensorWithMeasurementDto;
+import ru.yamshikov.rest.api.projectthree.mappers.sensor.SetSensorMapper;
 import ru.yamshikov.rest.api.projectthree.models.Sensor;
 import ru.yamshikov.rest.api.projectthree.services.MeasurementService;
-import ru.yamshikov.rest.api.projectthree.util.errors.exceptions.measurement.MeasurementNotRegistratedException;
-import ru.yamshikov.rest.api.projectthree.util.errors.exceptions.sensor.SensorNotCreatedException;
+import ru.yamshikov.rest.api.projectthree.util.errors.ErrorResponse;
+import ru.yamshikov.rest.api.projectthree.util.validations.RegistrationMeasurementDtoValidation;
 
-import java.util.List;
 import java.util.Set;
 
 @RestController
 @RequestMapping("/api/measurements")
 @AllArgsConstructor
+@Tag(name = "Операции с измерениями")
 public class MeasurementController {
 
+    private final RegistrationMeasurementDtoValidation measurementDtoValidation;
     private final MeasurementService measurementService;
-    private final MeasurementMapper measurementMapper;
-    private final MeasurementSensorMapper measurementSensorMapper;
-    private final SensorMapper sensorMapper;
 
+    private final SetSensorMapper setSensorMapper;
+
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK. Список измерений у каждого датчика",
+                    content = {@Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = SensorWithMeasurementDto.class)))}),
+            @ApiResponse(responseCode = "404", description = "NOT_FOUND. Попытка получить список измерений при их отсутствии",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))})})
+    @Operation(summary = "Получить список всех измерений каждого датчика")
     @GetMapping()
-    public ResponseEntity<Set<SensorListMeasurementsDtoOut>>  measurementsPage(){
-        Set<Sensor> setSensor =  measurementService.findAllMeasurement();
+    public ResponseEntity<Set<SensorWithMeasurementDto>> measurementsPage() {
+        Set<Sensor> setSensor = measurementService.findAllMeasurement();
+        Set<SensorWithMeasurementDto> setSensorsDto = setSensorMapper.toDto(setSensor);
         return new ResponseEntity<>(
-                SensorListMeasurementsDtoOut.toSet(setSensor, measurementMapper, sensorMapper),
+                setSensorsDto,
                 HttpStatus.OK);
     }
 
-    @PostMapping("/add")
-    public ResponseEntity<HttpStatus> addPage(@RequestBody @Valid MeasurementSensorDtoIn dtoInfo, BindingResult bindingResult){
-        //Валидация DTO
-        if(bindingResult.hasErrors()){
-            List<FieldError> errors = bindingResult.getFieldErrors();
-            StringBuilder result = new StringBuilder();
-            for (FieldError error : errors){
-                result.append(error.getField())
-                        .append(" - ")
-                        .append(error.getDefaultMessage())
-                        .append("; ");
-            }
-            throw new MeasurementNotRegistratedException(result.toString());
-        }
-        //Получение измерения из DTO
-        Measurement measurement = MeasurementSensorDtoIn.toMeasurement(
-                dtoInfo,
-                measurementSensorMapper,
-                sensorMapper,
-                measurementMapper);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "CREATED. Измерение добавлено"),
+            @ApiResponse(responseCode = "400", description = "BAD_REQUEST. Ошибка валидации при добавлении измерения",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "409", description = "CONFLICT. Добавление измерения к незарегистрированному датчику",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))})})
+    @Operation(summary = "Добавить новое измерение")
+    @PostMapping("/add")
+    public ResponseEntity<HttpStatus> addPage(@RequestBody @Valid RegistrationMeasurementDto dto, BindingResult bindingResult) {
+        //Валидация DTO
+        measurementDtoValidation.validate(dto, bindingResult);
+        //Внесение в БД
+        measurementService.registrationMeasurement(dto);
+        //Ответ
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-
-
-
-
-
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK. Количество дней",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = WeatherDaysCountDtoOut.class))}),
+            @ApiResponse(responseCode = "404", description = "NOT_FOUND. Попытка получить список измерений при их отсутствии",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))})})
+    @Operation(summary = "Получить общее количество дней по типу погоды")
+    @GetMapping("/DaysCountWhereWeather")
+    public ResponseEntity<WeatherDaysCountDtoOut> daysCountWhereWeather(
+            @Parameter(
+                    description = "Тип погоды",
+                    examples = {@ExampleObject(name = "RAIN"),
+                            @ExampleObject(name = "SUN"),
+                            @ExampleObject(name = "FROG")})
+            @RequestParam(name = "weather", required = true) String weather) {
+        int countDays = measurementService.getCountAllWeatherDays(weather);
+        return new ResponseEntity<>(new WeatherDaysCountDtoOut(countDays), HttpStatus.OK);
+    }
 
 
 }

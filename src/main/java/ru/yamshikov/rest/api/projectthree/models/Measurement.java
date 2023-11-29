@@ -2,15 +2,13 @@ package ru.yamshikov.rest.api.projectthree.models;
 
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.CascadeType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import org.springframework.format.annotation.DateTimeFormat;
-import ru.yamshikov.rest.api.projectthree.util.mapper.AbstractEntity;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -18,7 +16,7 @@ import java.time.LocalDateTime;
 @Data
 @ToString(of = {"id","temperature", "humidity", "weather", "registratedAt"})
 @EqualsAndHashCode(of = {"id","temperature", "humidity", "weather", "registratedAt"})
-public class Measurement implements AbstractEntity {
+public class Measurement {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,6 +33,7 @@ public class Measurement implements AbstractEntity {
     private String weather;
 
     @Column(name = "registrated_at")
+    @Temporal(value = TemporalType.TIMESTAMP)
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime registratedAt;
 
