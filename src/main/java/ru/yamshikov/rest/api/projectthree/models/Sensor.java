@@ -7,8 +7,9 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import org.springframework.format.annotation.DateTimeFormat;
-import ru.yamshikov.rest.api.projectthree.util.mapper.AbstractEntity;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -18,7 +19,7 @@ import java.util.List;
 @Data
 @ToString(of = {"id", "name", "serialNumber", "registratedAt"})
 @EqualsAndHashCode(of = {"id", "name", "serialNumber", "registratedAt"})
-public class Sensor implements AbstractEntity {
+public class Sensor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "sensor_id")
@@ -39,6 +40,7 @@ public class Sensor implements AbstractEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "model_id", referencedColumnName = "model_id")
+    @Cascade(CascadeType.ALL)
     private SensorDetails details;
 
     @OneToMany(mappedBy = "sensor", fetch = FetchType.LAZY)

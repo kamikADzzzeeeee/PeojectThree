@@ -16,7 +16,7 @@ CREATE TABLE Measurement (
     temperature int NOT NULL CHECK(temperature BETWEEN -100 AND 100),
     humidity int NOT NULL CHECK(humidity BETWEEN 0 AND 100),
     weather varchar(20) NOT NULL,
-    registrated_at date NOT NULL
+    registrated_at timestamp
 );
 
 DROP TABLE Measurement;

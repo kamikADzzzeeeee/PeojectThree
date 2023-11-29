@@ -2,8 +2,7 @@ package ru.yamshikov.rest.api.projectthree.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.List;
 
